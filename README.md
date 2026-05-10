@@ -1,7 +1,7 @@
 <table>
 <tr>
 <td width="150">
-<img src="assets/GRDocs.png" width="100%" style="display:block;">
+<img src="assets/GRDocs.jpg" width="100%" style="display:block;">
 </td>
 <td>
 <h1>GR Docs</h1>
@@ -38,7 +38,7 @@
 > [!NOTE]
 > GR Docs utiliza modelos de IA avanzados para generar código que crea documentos profesionales. No es un simple template, ¡es un generador inteligente!
 
-Gracias a **Claude Sonnet, Gemini, Llama y otros modelos de IA**, puedes:
+Gracias a **Llama, Gemini, Qwen y otros modelos de IA**, puedes:
 
 * 📝 Generar **documentos Word** con formato profesional usando `docx`
 * 📊 Crear **hojas de cálculo Excel** con fórmulas y gráficos usando `openpyxl`
@@ -56,7 +56,7 @@ Gracias a **Claude Sonnet, Gemini, Llama y otros modelos de IA**, puedes:
 ```mermaid
 graph TD
     A[👤 Usuario] -->|Describe Documento| B(🤖 GR Docs)
-    B -->|Selecciona Modelo IA| C{🧠 Claude/Gemini/Llama}
+    B -->|Selecciona Modelo IA| C{🧠 Llama/Gemini/Qwen}
     C -->|Genera Script| D[📜 Script JS/Python]
     D -->|Ejecuta| E[⚙️ Librería docx/openpyxl/pptxgenjs]
     E -->|Crea| F[📄 Documento Final]
@@ -78,10 +78,10 @@ graph TD
 | **Personalización Total** | Colores, estilos, tablas, gráficos, todo configurable |
 | **Ejecución Automática** | Los scripts se ejecutan y generan el documento final |
 | **Modo Local e API** | Usa desde terminal o integra en tus aplicaciones |
-| **Múltiples Modelos IA** | Claude, Gemini, Llama, Qwen, DeepSeek y más |
+| **Múltiples Modelos IA** | Llama, Gemini, Qwen, DeepSeek, Mistral y más vía OpenRouter |
 
 > [!IMPORTANT]
-> GR Docs requiere una API key de OpenRouter o Anthropic para funcionar. Los modelos gratuitos tienen límites de uso.
+> GR Docs requiere una API key de OpenRouter para funcionar. Hay muchos modelos completamente gratuitos disponibles.
 
 ---
 
@@ -141,12 +141,14 @@ Esto instalará:
 
 ### 5️⃣ Configurar la API Key
 
-Para que **GR Docs** funcione necesitas una **API key de OpenRouter o Anthropic**.
+Para que **GR Docs** funcione necesitas una **API key de OpenRouter**.
 
 | Servicio | Badge | Pasos para generar la API |
 | --- | --- | --- |
-| **Anthropic (Claude)** | <img src="https://www.anthropic.com/images/icons/apple-touch-icon.png" alt="Anthropic" width="32"/> | 1. Ve a [Anthropic Console](https://console.anthropic.com/)<br>2. Crea una cuenta o inicia sesión<br>3. Genera tu API key en Settings |
-| **OpenRouter** | <img src="https://openrouter.ai/favicon.ico" alt="OpenRouter" width="32"/> | 1. Ve a [OpenRouter Keys](https://openrouter.ai/settings/keys)<br>2. Inicia sesión o crea una cuenta<br>3. Genera tu API key (hay modelos gratuitos disponibles) |
+| **OpenRouter** | <img src="https://openrouter.ai/favicon.ico" alt="OpenRouter" width="32"/> | 1. Ve a [OpenRouter Keys](https://openrouter.ai/settings/keys)<br>2. Inicia sesión o crea una cuenta<br>3. Genera tu API key<br>4. **Hay modelos gratuitos disponibles** sin necesidad de pago |
+
+> [!TIP]
+> OpenRouter te da acceso a múltiples modelos de IA (Claude, Gemini, Llama, etc.) con una sola API key. Muchos modelos son completamente gratuitos.
 
 ### Tu `.env` debe quedar así:
 
@@ -166,11 +168,11 @@ GR Docs soporta múltiples modelos de IA a través de OpenRouter:
 
 ```mermaid
 pie title Distribución de Modelos por Proveedor
-    "Anthropic (Claude)" : 25
+    "Meta (Llama)" : 25
     "Google (Gemini)" : 20
-    "Meta (Llama)" : 20
-    "Alibaba (Qwen)" : 15
-    "DeepSeek" : 10
+    "Alibaba (Qwen)" : 20
+    "DeepSeek" : 15
+    "Mistral" : 10
     "Otros" : 10
 ```
 
@@ -179,16 +181,18 @@ pie title Distribución de Modelos por Proveedor
 
 <br>
 
+> [!NOTE]
+> Todos estos modelos están disponibles a través de **OpenRouter** con una sola API key.
+
 ---
 
-### 🟣 Anthropic – Claude (Recomendado)
+### 🟣 Meta – Llama (Recomendado para uso gratuito)
 
-[![Claude Sonnet 4.6](https://img.shields.io/badge/Claude_Sonnet_4.6-8A2BE2?style=for-the-badge&logo=anthropic)](#)
-[![Claude Sonnet 3.5](https://img.shields.io/badge/Claude_Sonnet_3.5-8A2BE2?style=for-the-badge&logo=anthropic)](#)
-[![Claude Haiku 3.5](https://img.shields.io/badge/Claude_Haiku_3.5-8A2BE2?style=for-the-badge&logo=anthropic)](#)
+[![Llama 3.3 70B](https://img.shields.io/badge/Llama_3.3_70B-6E60F6?style=for-the-badge&logo=meta)](#)
+[![Llama 3.2 3B](https://img.shields.io/badge/Llama_3.2_3B-6E60F6?style=for-the-badge&logo=meta)](#)
 
 > [!TIP]
-> Claude Sonnet 4.6 es el modelo recomendado para generar documentos complejos con alta calidad.
+> Llama 3.3 70B es gratuito y ofrece excelente calidad para generar documentos.
 
 ---
 
@@ -200,24 +204,34 @@ pie title Distribución de Modelos por Proveedor
 
 ---
 
-### 🟣 Meta – Llama
-
-[![Llama 3.3 70B](https://img.shields.io/badge/Llama_3.3_70B-6E60F6?style=for-the-badge&logo=meta)](#)
-[![Llama 3.2 3B](https://img.shields.io/badge/Llama_3.2_3B-6E60F6?style=for-the-badge&logo=meta)](#)
-
----
-
-### 🟥 Alibaba – Qwen
+### � Alibaba – Qwen
 
 [![Qwen3 Coder 480B](https://img.shields.io/badge/Qwen3_Coder_480B-D32F2F?style=for-the-badge)](#)
 [![Qwen2.5 72B](https://img.shields.io/badge/Qwen2.5_72B-D32F2F?style=for-the-badge)](#)
 
 ---
 
-### 🟨 DeepSeek
+### � DeepSeek
 
 [![DeepSeek R1](https://img.shields.io/badge/DeepSeek_R1-F9A825?style=for-the-badge)](#)
 [![DeepSeek V3](https://img.shields.io/badge/DeepSeek_V3-F9A825?style=for-the-badge)](#)
+
+---
+
+### 🔵 Mistral
+
+[![Mistral Nemo](https://img.shields.io/badge/Mistral_Nemo-00A3E0?style=for-the-badge)](#)
+[![Mistral 7B](https://img.shields.io/badge/Mistral_7B-00A3E0?style=for-the-badge)](#)
+
+---
+
+### � Anthropic – Claude (Requiere créditos)
+
+[![Claude Sonnet 4.6](https://img.shields.io/badge/Claude_Sonnet_4.6-8A2BE2?style=for-the-badge&logo=anthropic)](#)
+[![Claude Sonnet 3.5](https://img.shields.io/badge/Claude_Sonnet_3.5-8A2BE2?style=for-the-badge&logo=anthropic)](#)
+
+> [!WARNING]
+> Los modelos de Claude requieren créditos en OpenRouter, no son gratuitos.
 
 ---
 
@@ -229,8 +243,11 @@ Edita `settings.yaml` para cambiar el modelo:
 
 ```yaml
 # AI model (use list_models.py to see available free models)
-model: anthropic/claude-sonnet-4.6
+model: meta-llama/llama-3.3-70b-instruct:free
 ```
+
+> [!NOTE]
+> Puedes usar cualquier modelo disponible en OpenRouter. Los modelos con `:free` al final son completamente gratuitos.
 
 Para ver todos los modelos gratuitos disponibles:
 
@@ -414,7 +431,7 @@ pip install openpyxl
 ### ❌ El modelo genera código con errores
 
 > [!TIP]
-> Algunos modelos gratuitos pueden generar código de menor calidad. Prueba con Claude Sonnet 4.6 o Gemini 2.0 Flash para mejores resultados.
+> Algunos modelos gratuitos pueden generar código de menor calidad. Prueba con Llama 3.3 70B o Gemini 2.0 Flash para mejores resultados gratuitos.
 
 ---
 
@@ -451,7 +468,7 @@ Las contribuciones son bienvenidas. Por favor:
 * [Documentación de openpyxl](https://openpyxl.readthedocs.io/)
 * [Documentación de pptxgenjs](https://gitbrent.github.io/PptxGenJS/)
 * [OpenRouter API](https://openrouter.ai/docs)
-* [Anthropic Claude](https://www.anthropic.com/)
+* [OpenRouter Models](https://openrouter.ai/models)
 
 ---
 

@@ -22,4 +22,8 @@ prompt_xlsx: xlsx/prompt.gr
 prompt_pptx: pptx/prompt.gr
 
 # AI model (use list_models.py to see available free models)
-model: anthropic/claude-sonnet-4.6
+# Recommended free models:
+#   meta-llama/llama-3.3-70b-instruct:free
+#   google/gemini-2.0-flash-001:free
+#   qwen/qwen3-coder:free
+model: meta-llama/llama-3.3-70b-instruct:free
