@@ -1,0 +1,25 @@
+# ─────────────────────────────────────────
+#  GR Docs - Configuration File
+# ─────────────────────────────────────────
+
+# Default mode to launch when no --mode flag is provided
+# Options: local | api | none
+default_mode: none
+
+# File where the conversation context/system prompt is stored
+context_file: assets/context.gr
+
+# Port used by the API server (only applies in api mode)
+port: 8000
+
+# DOCX
+prompt_docx: doc/prompt.gr
+
+# XLSX
+prompt_xlsx: xlsx/prompt.gr
+
+# PPTX
+prompt_pptx: pptx/prompt.gr
+
+# AI model (use list_models.py to see available free models)
+model: anthropic/claude-sonnet-4.6
