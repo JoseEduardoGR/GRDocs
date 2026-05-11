@@ -71,6 +71,17 @@ def handle_runtime_error(e, dependency_name="Node.js"):
     """Maneja errores de runtime y retorna respuesta JSON apropiada."""
     error_msg = str(e)
     
+    # Detectar error de sintaxis de ES6 modules (Node.js antiguo)
+    if 'SyntaxError: Unexpected token' in error_msg and 'import' in error_msg:
+        return jsonify({
+            "success": False,
+            "error": "Versión de Node.js incompatible (requiere v14+)",
+            "error_type": "dependency_version_error",
+            "details": "Tu versión de Node.js no soporta módulos ES6",
+            "suggestion": "Actualiza Node.js a la versión 14 o superior: https://nodejs.org/",
+            "current_nodejs_version": "< v14 (detectado por error de sintaxis)"
+        }), 500
+    
     if 'rate-limited' in error_msg.lower() or '429' in error_msg:
         return jsonify({
             "success": False,
@@ -458,6 +469,35 @@ def internal_error(error):
     }), 500
 
 
+def check_nodejs_version():
+    """Verifica que Node.js esté instalado y sea versión 14+."""
+    try:
+        import subprocess
+        result = subprocess.run(['node', '--version'], capture_output=True, text=True, timeout=5)
+        if result.returncode == 0:
+            version_str = result.stdout.strip()
+            # Extraer número de versión (ej: "v10.19.0" -> 10)
+            version_major = int(version_str.lstrip('v').split('.')[0])
+            
+            if version_major < 14:
+                print(Fore.RED + f"⚠️  ADVERTENCIA: Node.js {version_str} detectado")
+                print(Fore.YELLOW + f"   GR Docs requiere Node.js v14+ para módulos ES6")
+                print(Fore.YELLOW + f"   Actualiza desde: https://nodejs.org/\n")
+                return False
+            else:
+                print(Fore.GREEN + f"✓ Node.js {version_str} detectado")
+                return True
+        else:
+            print(Fore.RED + "⚠️  Node.js no encontrado en el PATH")
+            return False
+    except FileNotFoundError:
+        print(Fore.RED + "⚠️  Node.js no está instalado")
+        return False
+    except Exception as e:
+        print(Fore.YELLOW + f"⚠️  No se pudo verificar versión de Node.js: {e}")
+        return False
+
+
 def main():
     """Iniciar el servidor Flask."""
     port = settings.get('port', 8000)
@@ -465,6 +505,9 @@ def main():
     print(Fore.CYAN + Style.BRIGHT + "\n╔════════════════════════════════════════════════════════════════╗")
     print(Fore.CYAN + Style.BRIGHT + "║                    GR DOCS API SERVER                          ║")
     print(Fore.CYAN + Style.BRIGHT + "╚════════════════════════════════════════════════════════════════╝\n")
+    
+    # Verificar Node.js
+    check_nodejs_version()
     
     print(Fore.YELLOW + f"🚀 Servidor iniciando en http://localhost:{port}")
     print(Fore.GREEN + f"📝 Modelo configurado: {settings.get('model', 'unknown')}\n")
