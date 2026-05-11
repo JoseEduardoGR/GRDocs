@@ -27,11 +27,12 @@ def _load_api_key() -> str:
 
 
 class Engine:
-    def __init__(self, settings_path: str = SETTINGS_PATH):
+    def __init__(self, settings_path: str = SETTINGS_PATH, verbose: bool = True):
         self.settings = self._load_settings(settings_path)
         self.port     = self.settings.get("port") or 8000
         self.context  = self._load_context()
         self.history  = []
+        self.verbose  = verbose
 
         # Obtener modelo desde settings.yaml o usar fallback
         configured_model = self.settings.get("model")
@@ -40,21 +41,25 @@ class Engine:
             # Si hay modelo configurado en el YAML, usarlo
             self.model = configured_model
             self.model_vision = configured_model  # Usar el mismo para visión por defecto
-            print(Fore.CYAN + f"[Engine] Modelo configurado: {self.model}")
+            if self.verbose:
+                print(Fore.CYAN + f"[Engine] Modelo configurado: {self.model}")
         else:
             # Si no hay modelo en YAML, usar qwen/qwen3-coder:free como fallback
             self.model = "qwen/qwen3-coder:free"
             self.model_vision = "qwen/qwen3-coder:free"
-            print(Fore.YELLOW + f"[Engine] No hay modelo en settings.yaml, usando fallback: {self.model}")
+            if self.verbose:
+                print(Fore.YELLOW + f"[Engine] No hay modelo en settings.yaml, usando fallback: {self.model}")
         
         # Intentar obtener un modelo de visión específico si está disponible
         catalog = OpenRouterCatalog()
         models_vision = catalog.filter_models(free_only=True, modality="text+image->text")
         if models_vision:
             self.model_vision = models_vision[0]["id"]
-            print(Fore.CYAN + f"[Engine] Modelo visión: {self.model_vision}")
+            if self.verbose:
+                print(Fore.CYAN + f"[Engine] Modelo visión: {self.model_vision}")
         else:
-            print(Fore.CYAN + f"[Engine] Modelo visión: {self.model_vision} (mismo que texto)")
+            if self.verbose:
+                print(Fore.CYAN + f"[Engine] Modelo visión: {self.model_vision} (mismo que texto)")
 
     # ─── Config ───────────────────────────────────────────────────────────────
 
@@ -165,9 +170,9 @@ class OpenRouterEngine(Engine):
 
     API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
-    def __init__(self, settings_path: str = SETTINGS_PATH):
+    def __init__(self, settings_path: str = SETTINGS_PATH, verbose: bool = True):
         self.api_key = _load_api_key()
-        super().__init__(settings_path)
+        super().__init__(settings_path, verbose)
 
     def _run(self, use_vision: bool = False) -> str:
         """Llama a la API de OpenRouter y retorna el texto de respuesta.
@@ -189,11 +194,39 @@ class OpenRouterEngine(Engine):
             "messages": self._build_messages(use_vision=use_vision),
         }
 
-        try:
-            response = requests.post(self.API_URL, headers=headers, json=payload, timeout=60)
-            response.raise_for_status()
-            return response.json()["choices"][0]["message"]["content"]
-        except requests.exceptions.HTTPError as e:
-            return f"[Error HTTP {response.status_code}] {response.text}"
-        except Exception as e:
-            return f"[Error] {e}"
+        max_retries = 3
+        retry_delay = 5  # segundos
+
+        for attempt in range(max_retries):
+            try:
+                response = requests.post(self.API_URL, headers=headers, json=payload, timeout=60)
+                
+                # Si es rate limit (429), esperar y reintentar
+                if response.status_code == 429:
+                    error_data = response.json()
+                    retry_after = error_data.get("error", {}).get("metadata", {}).get("retry_after_seconds", retry_delay)
+                    
+                    if attempt < max_retries - 1:
+                        print(Fore.YELLOW + f"[Engine] Rate limit alcanzado. Reintentando en {retry_after}s... (intento {attempt + 1}/{max_retries})")
+                        import time
+                        time.sleep(retry_after)
+                        continue
+                    else:
+                        return f"[Error HTTP 429] Modelo temporalmente limitado. Intenta con otro modelo o espera {retry_after}s."
+                
+                response.raise_for_status()
+                return response.json()["choices"][0]["message"]["content"]
+                
+            except requests.exceptions.HTTPError as e:
+                if attempt < max_retries - 1 and response.status_code == 429:
+                    continue
+                return f"[Error HTTP {response.status_code}] {response.text}"
+            except Exception as e:
+                if attempt < max_retries - 1:
+                    print(Fore.YELLOW + f"[Engine] Error: {e}. Reintentando...")
+                    import time
+                    time.sleep(retry_delay)
+                    continue
+                return f"[Error] {e}"
+        
+        return "[Error] Máximo de reintentos alcanzado."

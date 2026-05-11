@@ -12,6 +12,11 @@ context_file: assets/context.gr
 # Port used by the API server (only applies in api mode)
 port: 8000
 
+# Verbose mode - Show detailed logs and model information
+# true: Show all logs (recommended for local mode)
+# false: Minimal logs (recommended for api mode)
+verbose: false
+
 # DOCX
 prompt_docx: doc/prompt.gr
 
@@ -23,7 +28,8 @@ prompt_pptx: pptx/prompt.gr
 
 # AI model (use list_models.py to see available free models)
 # Recommended free models:
-#   meta-llama/llama-3.3-70b-instruct:free
-#   google/gemini-2.0-flash-001:free
-#   qwen/qwen3-coder:free
-model: meta-llama/llama-3.3-70b-instruct:free
+#   google/gemini-2.0-flash-001:free (Fast and reliable)
+#   meta-llama/llama-3.3-70b-instruct:free (High quality, may have rate limits)
+#   qwen/qwen3-coder:free (Good for code generation)
+#   mistral/mistral-nemo:free (Balanced performance)
+model: anthropic/claude-opus-4.7

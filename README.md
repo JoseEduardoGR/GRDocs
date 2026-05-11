@@ -77,8 +77,9 @@ graph TD
 | **Multi-formato** | Word (.docx), Excel (.xlsx), PowerPoint (.pptx) |
 | **Personalización Total** | Colores, estilos, tablas, gráficos, todo configurable |
 | **Ejecución Automática** | Los scripts se ejecutan y generan el documento final |
-| **Modo Local e API** | Usa desde terminal o integra en tus aplicaciones |
+| **Modo Local e API** | Usa desde terminal o integra en tus aplicaciones vía REST API |
 | **Múltiples Modelos IA** | Llama, Gemini, Qwen, DeepSeek, Mistral y más vía OpenRouter |
+| **Manejo de Errores** | Detección automática de rate limits y errores con sugerencias |
 
 > [!IMPORTANT]
 > GR Docs requiere una API key de OpenRouter para funcionar. Hay muchos modelos completamente gratuitos disponibles.
@@ -150,15 +151,55 @@ Para que **GR Docs** funcione necesitas una **API key de OpenRouter**.
 > [!TIP]
 > OpenRouter te da acceso a múltiples modelos de IA (Claude, Gemini, Llama, etc.) con una sola API key. Muchos modelos son completamente gratuitos.
 
-### Tu `.env` debe quedar así:
+#### 📝 Crear el archivo `.env`
+
+**Opción 1: Usando echo (Linux/Mac)**
 
 ```bash
-# Crea el archivo .env en la raíz del proyecto
 echo "TU_API_KEY_AQUI" > .env
 ```
 
+**Opción 2: Usando un editor**
+
+```bash
+# Con nano
+nano .env
+
+# Con vim
+vim .env
+
+# Con VS Code
+code .env
+```
+
+Luego pega tu API key y guarda el archivo.
+
+**Opción 3: Copiar desde plantilla**
+
+```bash
+# Crear archivo .env con tu API key
+cat > .env << EOF
+sk-or-v1-tu-api-key-aqui
+EOF
+```
+
+#### ✅ Verificar la Configuración
+
+```bash
+# Verificar que el archivo existe
+ls -la .env
+
+# Ver los primeros caracteres (sin mostrar la key completa)
+head -c 20 .env && echo "..."
+```
+
+**Salida esperada:**
+```
+sk-or-v1-1234567890...
+```
+
 > [!CAUTION]
-> **NUNCA** subas tu archivo `.env` a GitHub. Ya está incluido en `.gitignore`.
+> **NUNCA** compartas tu API key ni la subas a GitHub. El archivo `.env` ya está en `.gitignore`.
 
 ---
 
@@ -297,7 +338,22 @@ python main.py -m api
 Esto iniciará un servidor FastAPI en `http://localhost:8000`
 
 > [!NOTE]
-> El modo API está en desarrollo. Próximamente documentación completa.
+> El modo API permite integrar GR Docs en tus aplicaciones. Ver [API_EXAMPLES.md](API_EXAMPLES.md) para documentación completa.
+
+**Endpoints disponibles:**
+- `GET /` - Información de la API
+- `GET /health` - Estado del servidor
+- `POST /docx` - Generar documento Word
+- `POST /xlsx` - Generar archivo Excel
+- `POST /pptx` - Generar presentación PowerPoint
+
+**Ejemplo rápido:**
+```bash
+curl -X POST http://localhost:8000/docx \
+  -H "Content-Type: application/json" \
+  -d '{"request":"Informe de ventas Q1 2024","download":true,"send_file":true}' \
+  --output informe.docx
+```
 
 ---
 
@@ -389,12 +445,30 @@ GR_DOCS/
 > Verifica que el archivo `.env` exista en la raíz del proyecto y contenga tu API key.
 
 ```bash
-# Verifica que existe
+# Verificar que existe
 ls -la .env
 
-# Verifica el contenido (sin mostrar la key completa)
+# Verificar el contenido (sin mostrar la key completa)
 head -c 20 .env && echo "..."
+
+# Si no existe, créalo
+echo "sk-or-v1-tu-api-key-aqui" > .env
 ```
+
+**Formato correcto del `.env`:**
+```
+sk-or-v1-1234567890abcdef...
+```
+
+**Formato INCORRECTO:**
+```
+API_KEY=sk-or-v1-...  ❌ (No uses variables)
+"sk-or-v1-..."        ❌ (No uses comillas)
+sk-or-v1-... \n       ❌ (No dejes espacios o saltos de línea)
+```
+
+> [!TIP]
+> El archivo `.env` debe contener **solo la API key**, sin `API_KEY=`, sin comillas, sin espacios extras.
 
 ### ❌ Error: "Node.js no está instalado"
 

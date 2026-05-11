@@ -14,9 +14,14 @@ from assets.engine import OpenRouterEngine
 class ExcelScriptGenerator:
     """Genera scripts Python para crear archivos Excel usando el modelo de IA."""
     
-    def __init__(self, settings_path: str = "settings.yaml"):
+    def __init__(self, settings_path: str = "settings.yaml", verbose: bool = None):
         self.settings = self._load_settings(settings_path)
-        self.engine = OpenRouterEngine(settings_path)
+        
+        # Si verbose no se especifica, leer desde settings.yaml
+        if verbose is None:
+            verbose = self.settings.get("verbose", True)
+        
+        self.engine = OpenRouterEngine(settings_path, verbose=verbose)
         self.prompt_path = self.settings.get("prompt_xlsx", "xlsx/prompt.gr")
         self.cache_dir = Path("xlsx/cache")
         self.output_dir = self.cache_dir / "output"
